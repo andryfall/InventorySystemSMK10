@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bhp_items', function (Blueprint $table) {
             $table->id('bhp');
-            $table->foreignId('kode barang')->constrained('kode_barang')->onDelete('cascade');
+            $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
             $table->string('keterangan', 250);
             $table->string('uraian', 250);
             $table->string('satuan', 8);
