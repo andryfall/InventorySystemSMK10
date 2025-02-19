@@ -20,7 +20,5 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-*.yaml
-*.yml
 *.env
 
