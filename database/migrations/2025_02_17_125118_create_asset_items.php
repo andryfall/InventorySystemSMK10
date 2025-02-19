@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('asset_items', function (Blueprint $table) {
             $table->id('aset');
-            $table->foreignId('kode barang')->constrained('kode_barang')->onDelete('cascade');
-            $table->foreignId('lokasi')->constrained('lokasi')->onDelete('cascade');
+            $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
+            $table->foreignId('lokasi_id')->constrained('lokasi')->onDelete('cascade');
             $table->string('keterangan', 250);
             $table->string('uraian', 250);
             $table->string('satuan', 8);
