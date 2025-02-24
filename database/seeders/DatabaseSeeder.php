@@ -12,10 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Using the factory to create a user with specific data
         User::factory()->create([
-            'username' => 'admin',   // Set username
-            'password' => \Illuminate\Support\Facades\Hash::make('pass123'), // Set hashed password
+            'username' => 'admin', 
+            'password' => \Illuminate\Support\Facades\Hash::make('pass123'),
         ]);
     }
 }
