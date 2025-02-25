@@ -23,7 +23,7 @@ class LokasiController extends Controller
     {
         // Validate the request
         $validated = $request->validate([
-            'nama_kelas' => 'required|string|max:50',
+            'nama_gedung' => 'required|string|max:50',
         ]);
 
         // Create a new lokasi
@@ -50,7 +50,7 @@ class LokasiController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama_kelas' => 'required|string|max:50',
+            'nama_gedung' => 'required|string|max:50',
         ]);
 
         $lokasi = Lokasi::findOrFail($id);
