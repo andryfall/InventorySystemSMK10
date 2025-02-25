@@ -9,21 +9,27 @@ class KodeBarang extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'kode_barang';
+    protected $table = 'kode_barang'; // Ensure Laravel uses the correct table name
+
+    protected $fillable = [
+        'kode',
+        'uraian',
+        'parent_id',
+    ];
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
+     * Get the children of this KodeBarang (subcategories or sub-items).
      */
-    protected $fillable = [
-        'nama_barang',
-        'jenis_barang',
-        'merk',
-    ];
+    public function children()
+    {
+        return $this->hasMany(KodeBarang::class, 'parent_id');
+    }
+
+    /**
+     * Get the parent of this KodeBarang (if it belongs to a higher-level category).
+     */
+    public function parent()
+    {
+        return $this->belongsTo(KodeBarang::class, 'parent_id');
+    }
 }

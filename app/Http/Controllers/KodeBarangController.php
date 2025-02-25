@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\KodeBarang;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class KodeBarangController extends Controller
 {
@@ -12,7 +14,7 @@ class KodeBarangController extends Controller
      */
     public function index()
     {
-        return response()->json(KodeBarang::all(), 200);
+        return response()->json(KodeBarang::all());
     }
 
     /**
@@ -21,17 +23,13 @@ class KodeBarangController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_barang' => 'required|string|max:250',
-            'jenis_barang' => 'required|string|max:250',
-            'merk' => 'required|string|max:250',
+            'kode' => 'required|string|unique:kode_barangs,kode',
+            'uraian' => 'required|string',
+            'parent_id' => 'nullable|exists:kode_barangs,id',
         ]);
 
         $kodeBarang = KodeBarang::create($validated);
-
-        return response()->json([
-            'message' => 'Kode Barang created successfully',
-            'kode_barang' => $kodeBarang,
-        ], 201);
+        return response()->json(['message' => 'Kode Barang created successfully', 'data' => $kodeBarang], 201);
     }
 
     /**
@@ -39,13 +37,8 @@ class KodeBarangController extends Controller
      */
     public function show($id)
     {
-        $kodeBarang = KodeBarang::find($id);
-
-        if (!$kodeBarang) {
-            return response()->json(['message' => 'Kode Barang not found'], 404);
-        }
-
-        return response()->json($kodeBarang, 200);
+        $kodeBarang = KodeBarang::findOrFail($id);
+        return response()->json($kodeBarang);
     }
 
     /**
@@ -53,24 +46,16 @@ class KodeBarangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $kodeBarang = KodeBarang::find($id);
-
-        if (!$kodeBarang) {
-            return response()->json(['message' => 'Kode Barang not found'], 404);
-        }
-
         $validated = $request->validate([
-            'nama_barang' => 'sometimes|string|max:250',
-            'jenis_barang' => 'sometimes|string|max:250',
-            'merk' => 'sometimes|string|max:250',
+            'kode' => 'string|unique:kode_barangs,kode,' . $id,
+            'uraian' => 'string',
+            'parent_id' => 'nullable|exists:kode_barangs,id',
         ]);
 
+        $kodeBarang = KodeBarang::findOrFail($id);
         $kodeBarang->update($validated);
 
-        return response()->json([
-            'message' => 'Kode Barang updated successfully',
-            'kode_barang' => $kodeBarang,
-        ], 200);
+        return response()->json(['message' => 'Kode Barang updated successfully', 'data' => $kodeBarang]);
     }
 
     /**
@@ -78,14 +63,48 @@ class KodeBarangController extends Controller
      */
     public function destroy($id)
     {
-        $kodeBarang = KodeBarang::find($id);
-
-        if (!$kodeBarang) {
-            return response()->json(['message' => 'Kode Barang not found'], 404);
-        }
-
-        $kodeBarang->delete();
-
-        return response()->json(['message' => 'Kode Barang deleted successfully'], 200);
+        KodeBarang::destroy($id);
+        return response()->json(['message' => 'Kode Barang deleted successfully']);
     }
+
+    /**
+     * Import data from excel file.
+     */
+    public function importFile(Request $request)
+    {
+        $request->validate([
+            'xlsx_file' => 'required|mimes:xlsx',
+        ]);
+    
+        $file = $request->file('xlsx_file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+    
+        $lastParents = [];
+    
+        foreach ($rows as $index => $row) {
+            if ($index === 0) continue;
+    
+            $kode = trim($row[0]);
+            $uraian = trim($row[1]);
+    
+            if (!$kode || !$uraian) continue;
+    
+            $level = substr_count(rtrim($kode, '.'), '.');
+    
+            $parentId = $level > 0 ? ($lastParents[$level - 1] ?? null) : null;
+    
+            $item = KodeBarang::create([
+                'kode' => $kode,
+                'uraian' => $uraian,
+                'parent_id' => $parentId,
+            ]);
+    
+            $lastParents[$level] = $item->id;
+        }
+    
+        return response()->json(['message' => 'XLSX imported successfully'], 200);
+    }
+    
 }
