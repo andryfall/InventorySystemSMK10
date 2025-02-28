@@ -9,14 +9,25 @@ class AssetItem extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'aset';
+
     protected $fillable = [
         'kode_barang_id',
         'lokasi_id',
-        'keterangan',
-        'uraian',
+        'nama_barang',
+        'merk_barang',
         'satuan',
         'jumlah',
         'harga',
+        'tanggal_pembelian',
+        'no_spk_faktur_kuitansi',
+        'kode_rekening_belanja',
+        'no_bast',
+        'kode_rekening_aset',
+        'nama_rekening_aset',
+        'umur_ekonomis',
+        'nilai_perolehan',
+        'beban_penyusutan',
     ];
 
     public function kodeBarang()

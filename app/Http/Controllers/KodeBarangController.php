@@ -23,14 +23,37 @@ class KodeBarangController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode' => 'required|string|unique:kode_barangs,kode',
+            'kode' => 'required|string|unique:kode_barang,kode',
             'uraian' => 'required|string',
-            'parent_id' => 'nullable|exists:kode_barangs,id',
         ]);
-
+    
+        $parentKode = $this->getParentKode($validated['kode']);
+        $parent = KodeBarang::where('kode', $parentKode)->first();
+        $validated['parent_id'] = $parent ? $parent->id : null;
+    
         $kodeBarang = KodeBarang::create($validated);
-        return response()->json(['message' => 'Kode Barang created successfully', 'data' => $kodeBarang], 201);
+    
+        return response()->json([
+            'message' => 'Kode Barang created successfully',
+            'data' => $kodeBarang
+        ], 201);
     }
+    
+    /**
+     * Extract the parent kode by removing the last segment
+     */
+    private function getParentKode($kode)
+    {
+        $parts = explode('.', rtrim($kode, '.'));
+    
+        if (count($parts) <= 1) {
+            return null;
+        }
+    
+        array_pop($parts);
+        return implode('.', $parts) . '.'; // Rebuild parent kode
+    }
+    
 
     /**
      * Display the specified resource.
@@ -72,6 +95,9 @@ class KodeBarangController extends Controller
      */
     public function importFile(Request $request)
     {
+        ini_set('max_execution_time', 300);
+        ini_set('memory_limit', '512M');
+    
         $request->validate([
             'xlsx_file' => 'required|mimes:xlsx',
         ]);
@@ -82,6 +108,8 @@ class KodeBarangController extends Controller
         $rows = $sheet->toArray();
     
         $lastParents = [];
+        $dataToInsert = [];
+        $skippedItems = [];
     
         foreach ($rows as $index => $row) {
             if ($index === 0) continue;
@@ -91,20 +119,43 @@ class KodeBarangController extends Controller
     
             if (!$kode || !$uraian) continue;
     
+            // Determine level by counting periods (.)
             $level = substr_count(rtrim($kode, '.'), '.');
     
-            $parentId = $level > 0 ? ($lastParents[$level - 1] ?? null) : null;
+            // Find the correct parent ID from the last known parent at the previous level
+            $parentId = $level > 0 && isset($lastParents[$level - 1]) ? $lastParents[$level - 1] : null;
+    
+            if (KodeBarang::where('kode', $kode)->exists()) {
+                $skippedItems[] = [
+                    'kode' => $kode,
+                    'uraian' => $uraian,
+                    'reason' => 'Duplicate entry',
+                ];
+                continue;
+            }
     
             $item = KodeBarang::create([
                 'kode' => $kode,
                 'uraian' => $uraian,
                 'parent_id' => $parentId,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
     
+            // Store the last inserted ID at the current level
             $lastParents[$level] = $item->id;
         }
     
-        return response()->json(['message' => 'XLSX imported successfully'], 200);
+        return response()->json([
+            'message' => 'File imported successfully',
+            'skipped_items' => $skippedItems
+        ], 200);
+    }
+    
+    public function totalKodeBarang()
+    {
+        $total = KodeBarang::count();
+        return response()->json(['total_kodebarang' => $total], 200);
     }
     
 }

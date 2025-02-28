@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create([
             'username' => 'admin', 
+            'name' => 'Joko', 
             'password' => \Illuminate\Support\Facades\Hash::make('pass123'),
         ]);
     }

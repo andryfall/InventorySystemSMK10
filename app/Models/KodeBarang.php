@@ -9,7 +9,7 @@ class KodeBarang extends Model
 {
     use HasFactory;
 
-    protected $table = 'kode_barang'; // Ensure Laravel uses the correct table name
+    protected $table = 'kode_barang';
 
     protected $fillable = [
         'kode',
