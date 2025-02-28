@@ -21,12 +21,10 @@ class LokasiController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request
         $validated = $request->validate([
-            'nama_kelas' => 'required|string|max:50',
+            'nama_gedung' => 'required|string|max:50',
         ]);
 
-        // Create a new lokasi
         $lokasi = Lokasi::create($validated);
 
         return response()->json([
@@ -50,7 +48,7 @@ class LokasiController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama_kelas' => 'required|string|max:50',
+            'nama_gedung' => 'required|string|max:50',
         ]);
 
         $lokasi = Lokasi::findOrFail($id);
@@ -71,5 +69,11 @@ class LokasiController extends Controller
         $lokasi->delete();
 
         return response()->json(['message' => 'Lokasi deleted successfully']);
+    }
+    
+    public function totalLokasi()
+    {
+        $total = Lokasi::count();
+        return response()->json(['total_lokasi' => $total], 200);
     }
 }

@@ -15,11 +15,17 @@ return new class extends Migration
             $table->id('aset');
             $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
             $table->foreignId('lokasi_id')->constrained('lokasi')->onDelete('cascade');
-            $table->string('keterangan', 250);
-            $table->string('uraian', 250);
+            $table->string('merk_barang', 250);
             $table->string('satuan', 8);
             $table->integer('jumlah');
             $table->integer('harga');
+            $table->date('tanggal_pembelian');
+            $table->string('no_spk_faktur_kuitansi', 50);
+            $table->string('kode_rekening_belanja', 50);
+            $table->string('no_bast', 50);
+            $table->integer('umur_ekonomis');
+            $table->integer('nilai_perolehan');
+            $table->integer('beban_penyusutan');
             $table->timestamps();
         });
     }
