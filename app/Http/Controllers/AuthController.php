@@ -22,6 +22,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        $user->tokens()->delete();
+
         $token = $user->createToken('InventorySystem')->plainTextToken;
 
         return response()->json(['user' => $user, 'token' => $token]);
