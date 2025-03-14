@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('kode', 50)->unique();
             $table->string('uraian', 250);
-            $table->integer('umur_ekonomis');
             $table->unsignedBigInteger(column: 'parent_id')->nullable();
             $table->timestamps();
 
