@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('umur_ekonomis');
             $table->integer('nilai_perolehan');
             $table->integer('beban_penyusutan');
+            $table->string('kondisi', 50);
             $table->timestamps();
         });
     }

@@ -53,3 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/aset/total-harga/current', [AssetItemController::class, 'totalHargaCurrentMonthYear']);
     Route::get('/aset/total-harga/{year}', [AssetItemController::class, 'totalHargaByYear']);
 });
+
+use App\Http\Controllers\BalanceController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/balance', [BalanceController::class, 'show']);
+    Route::post('/balance/update', [BalanceController::class, 'update']);
+    Route::post('/balance/add', [BalanceController::class, 'add']);
+});
