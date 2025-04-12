@@ -33,6 +33,7 @@ class AssetItemController extends Controller
                     'umur_ekonomis' => $asset->umur_ekonomis,
                     'nilai_perolehan' => $asset->nilai_perolehan,
                     'beban_penyusutan' => $asset->beban_penyusutan,
+                    'kondisi' => $asset->kondisi,
                     'created_at' => $asset->created_at,
                     'updated_at' => $asset->updated_at,
                 ];
@@ -58,6 +59,7 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'required|integer',
             'nilai_perolehan' => 'required|integer',
             'beban_penyusutan' => 'required|integer',
+            'kondisi' => 'required|string|max:50',
         ]);
     
         $kodeBarang = \App\Models\KodeBarang::where('kode', $validated['kode'])->firstOrFail();
@@ -102,6 +104,7 @@ class AssetItemController extends Controller
                 'umur_ekonomis' => $asset->umur_ekonomis,
                 'nilai_perolehan' => $asset->nilai_perolehan,
                 'beban_penyusutan' => $asset->beban_penyusutan,
+                'kondisi' => $asset->kondisi,
                 'created_at' => $asset->created_at,
                 'updated_at' => $asset->updated_at,
             ]
@@ -128,6 +131,7 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'sometimes|integer',
             'nilai_perolehan' => 'sometimes|integer',
             'beban_penyusutan' => 'sometimes|integer',
+            'kondisi' => 'required|string|max:50',
         ]);
     
         if ($request->has('kode')) {
