@@ -59,5 +59,5 @@ use App\Http\Controllers\BalanceController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/balance', [BalanceController::class, 'show']);
     Route::post('/balance/update', [BalanceController::class, 'update']);
-    Route::post('/balance/add', [BalanceController::class, 'add']);
+    Route::post('/balance/add', action: [BalanceController::class, 'add']);
 });

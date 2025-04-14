@@ -28,7 +28,8 @@ class AssetItem extends Model
         'umur_ekonomis',
         'nilai_perolehan',
         'beban_penyusutan',
-        'kondisi'
+        'kondisi',
+        'sumber_perolehan'
     ];
 
     public function kodeBarang()

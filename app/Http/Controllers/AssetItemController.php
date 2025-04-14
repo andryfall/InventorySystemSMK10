@@ -105,6 +105,7 @@ class AssetItemController extends Controller
                 'nilai_perolehan' => $asset->nilai_perolehan,
                 'beban_penyusutan' => $asset->beban_penyusutan,
                 'kondisi' => $asset->kondisi,
+                'sumber_perolehan' => $asset->sumber_perolehan,
                 'created_at' => $asset->created_at,
                 'updated_at' => $asset->updated_at,
             ]
