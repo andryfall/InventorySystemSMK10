@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AssetItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class AssetItemController extends Controller
 {
@@ -174,11 +176,13 @@ class AssetItemController extends Controller
     {
         $totalMonth = AssetItem::whereYear('tanggal_pembelian', now()->year)
             ->whereMonth('tanggal_pembelian', now()->month)
-            ->sum('harga');
-
+            ->select(DB::raw('SUM(jumlah * harga) as total'))
+            ->value('total');
+    
         $totalYear = AssetItem::whereYear('tanggal_pembelian', now()->year)
-            ->sum('harga');
-
+            ->select(DB::raw('SUM(jumlah * harga) as total'))
+            ->value('total');
+    
         return response()->json([
             'total_harga_current_month' => $totalMonth,
             'total_harga_current_year' => $totalYear
