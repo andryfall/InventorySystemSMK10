@@ -33,6 +33,7 @@ class AssetItemController extends Controller
                     'umur_ekonomis' => $asset->umur_ekonomis,
                     'nilai_perolehan' => $asset->nilai_perolehan,
                     'beban_penyusutan' => $asset->beban_penyusutan,
+                    'sumber_perolehan' => $asset->sumber_perolehan,
                     'kondisi' => $asset->kondisi,
                     'created_at' => $asset->created_at,
                     'updated_at' => $asset->updated_at,
@@ -59,6 +60,7 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'required|integer',
             'nilai_perolehan' => 'required|integer',
             'beban_penyusutan' => 'required|integer',
+            'sumber_perolehan' => 'required|string|max:50',
             'kondisi' => 'required|string|max:50',
         ]);
     
@@ -132,6 +134,7 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'sometimes|integer',
             'nilai_perolehan' => 'sometimes|integer',
             'beban_penyusutan' => 'sometimes|integer',
+            'sumber_perolehan' => 'sometimes|string|max:50',
             'kondisi' => 'required|string|max:50',
         ]);
     
