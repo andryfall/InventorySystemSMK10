@@ -12,6 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         //
+        Schema::create('peminjam', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_peminjam', 250);
+            $table->timestamps();
+        });
     }
 
     /**
