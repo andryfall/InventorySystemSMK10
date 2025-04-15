@@ -14,11 +14,10 @@ return new class extends Migration
         Schema::create('bhp_items', function (Blueprint $table) {
             $table->id('bhp');
             $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
-            $table->string('keterangan', 250);
-            $table->string('uraian', 250);
-            $table->string('satuan', 8);
-            $table->integer('jumlah');
-            $table->integer('harga');
+            $table->foreignID('bhp_atribut_id')->constrained('bhp_atribut')->onDelete('cascade');
+            $table->foreignID('satuan_barang_id')->constrained('satuan_barang')->onDelete('cascade');
+            $table->foreignId('saldo_awal_id')->constrained('bhp_saldo_awal')->onDelete('cascade');
+            $table->foreignId('mutasi_id')->constrained('mutasi')->onDelete('cascade');
             $table->timestamps();
         });
     }
