@@ -51,7 +51,7 @@ class KodeBarangController extends Controller
         }
     
         array_pop($parts);
-        return implode('.', $parts) . '.'; // Rebuild parent kode
+        return implode('.', $parts) . '.';
     }
     
 
@@ -70,9 +70,9 @@ class KodeBarangController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'kode' => 'string|unique:kode_barangs,kode,' . $id,
+            'kode' => 'string|unique:kode_barang,kode,' . $id,
             'uraian' => 'string',
-            'parent_id' => 'nullable|exists:kode_barangs,id',
+            'parent_id' => 'nullable|exists:kode_barang,id',
         ]);
 
         $kodeBarang = KodeBarang::findOrFail($id);
