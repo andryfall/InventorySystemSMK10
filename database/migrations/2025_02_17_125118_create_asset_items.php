@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -24,10 +25,14 @@ return new class extends Migration
             $table->string('kode_rekening_belanja', 50);
             $table->string('no_bast', 50);
             $table->integer('umur_ekonomis');
+            $table->string('status', 8);
             $table->integer('nilai_perolehan');
             $table->integer('beban_penyusutan');
             $table->timestamps();
         });
+
+        // Add CHECK constraint to status column
+       DB::statement("ALTER TABLE asset_items ADD CONSTRAINT status_check CHECK (status IN ('Baik', 'Rusak', 'Berat'))");
     }
 
     /**
