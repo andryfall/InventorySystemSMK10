@@ -47,7 +47,7 @@ class ImportFile implements ShouldQueue
     
             if ($existingItem) {
                 Log::warning("Skipped duplicate entry: $kode - $uraian");
-                continue; // Skip if already exists
+                continue;
             }
     
             $item = KodeBarang::create([
