@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('mutasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bhp_atribut_id')->constrained('bhp_atribut')->onDelete('cascade');
-            $table->foreignId('mutasi_penambahan_id')->constrained('mutasi_penambahan')->onDelete('cascade');
-            $table->foreignId('mutasi_pengurangan_id')->constrained('mutasi_pengurangan')->onDelete('cascade');
+            $table->unsignedBigInteger('mutasi_penambahan_id');
+    $table->unsignedBigInteger('mutasi_pengurangan_id');
             $table->timestamps();
         });
     }

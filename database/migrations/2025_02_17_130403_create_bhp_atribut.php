@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('pemegang_barang', 250);
             $table->string('merk_barang', 250);
-            $table->integer('kode_rekening_belanja', 50);
+
+            // Not a primary key, just an auto-incrementing number if needed
+            $table->integer('kode_rekening_belanja');
             $table->string('nama_barang', 250);
-            $table->integer('volume', 50);
+
+            $table->integer('volume'); // or bigInteger if needed
             $table->integer('harga');
             $table->string('uraian', 250);
             $table->timestamps();

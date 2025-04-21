@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignID('bhp_atribut_id')->constrained('bhp_atribut')->onDelete('cascade');
             $table->foreignID('satuan_barang_id')->constrained('satuan_barang')->onDelete('cascade');
             $table->foreignId('saldo_awal_id')->constrained('bhp_saldo_awal')->onDelete('cascade');
-            $table->foreignId('pengambil_id')->constrained('pengambil')->onDelete('cascade');
+            $table->foreignId('peminjam_id')->constrained('peminjam')->onDelete('cascade');
             $table->foreignId('mutasi_id')->constrained('mutasi')->onDelete('cascade');
             $table->timestamps();
         });
