@@ -62,7 +62,6 @@ class LokasiController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($lokasi->image) {
                 Storage::disk('public')->delete($lokasi->image);
             }
@@ -85,7 +84,6 @@ class LokasiController extends Controller
     {
         $lokasi = Lokasi::findOrFail($id);
 
-        // Delete image file if exists
         if ($lokasi->image) {
             Storage::disk('public')->delete($lokasi->image);
         }
