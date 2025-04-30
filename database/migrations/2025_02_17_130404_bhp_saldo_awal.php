@@ -11,22 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kode_barang', function (Blueprint $table) {
+        //
+        Schema::create('bhp_saldo_awal', function (Blueprint $table) {
             $table->id();
-            $table->string('kode', 50)->unique();
-            $table->string('uraian', 250);
-            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreignId('bhp_atribut_id')->constrained('bhp_atribut')->onDelete('cascade');
+            $table->foreignId('satuan_barang_id')->constrained('satuan_barang')->onDelete('cascade');
+            $table->integer('tanggal')->default(0);
             $table->timestamps();
-            $table->foreign('parent_id')->references('id')->on('kode_barang')->onDelete('cascade');
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('kode_barang');
+        //
     }
 };

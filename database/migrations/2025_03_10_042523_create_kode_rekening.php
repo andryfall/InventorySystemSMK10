@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bhp_items', function (Blueprint $table) {
-            $table->id('bhp');
-            $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
-            $table->string('keterangan', 250);
+        Schema::create('kode_rekening', function (Blueprint $table) {
+            $table->id();
+            $table->string('kode', 50)->unique();
             $table->string('uraian', 250);
-            $table->string('satuan', 8);
-            $table->integer('jumlah');
-            $table->integer('harga');
             $table->timestamps();
         });
     }
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bhp_items');
+        Schema::dropIfExists('kode_rekening');
     }
 };

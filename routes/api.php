@@ -61,3 +61,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/balance/update', [BalanceController::class, 'update']);
     Route::post('/balance/add', action: [BalanceController::class, 'add']);
 });
+
+use App\Http\Controllers\KodeRekeningController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/kode-rekening/import', [KodeRekeningController::class, 'import']);
+    Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
+    Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
+    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'delete']);
+});
