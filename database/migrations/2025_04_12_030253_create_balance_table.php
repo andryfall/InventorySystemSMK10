@@ -11,23 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kode_barang', function (Blueprint $table) {
+        Schema::create('balance', function (Blueprint $table) {
             $table->id();
-            $table->string('kode', 50)->unique();
-            $table->string('uraian', 250);
-            $table->unsignedBigInteger(column: 'parent_id')->nullable();
+            $table->decimal('amount', 15, 2)->default(0);
             $table->timestamps();
-
-            $table->foreign('parent_id')->references('id')->on('kode_barang')->onDelete('cascade');
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('kode_barang');
+        Schema::dropIfExists('balance');
     }
 };
