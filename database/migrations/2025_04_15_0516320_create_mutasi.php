@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('riwayat_peminjaman', function (Blueprint $table) {
+        Schema::create('mutasi', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('bhp_item_id')->constrained('bhp_items')->onDelete('cascade');
+            $table->enum('type', ['add', 'remove']);
+            $table->integer('quantity');
+            $table->string('taker_name')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('riwayat_peminjaman');
+        Schema::dropIfExists('mutasi');
     }
 };
