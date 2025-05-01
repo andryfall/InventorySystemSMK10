@@ -73,8 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 use App\Http\Controllers\BhpItemController;
 
-Route::post('/bhp/import', [BhpItemController::class, 'import']);
-Route::get('/bhp/index', [BhpItemController::class, 'index']);
-Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
-Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
-Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/bhp/import', [BhpItemController::class, 'import']);
+    Route::get('/bhp/index', [BhpItemController::class, 'index']);
+    Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
+    Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
+    Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
+});
