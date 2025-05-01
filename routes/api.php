@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/kode-rekening/import', [KodeRekeningController::class, 'import']);
     Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
     Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
-    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'delete']);
+    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'destroy']);
 });
 
 use App\Http\Controllers\BhpItemController;

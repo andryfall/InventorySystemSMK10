@@ -11,7 +11,7 @@ class KodeRekeningController extends Controller
 {
     public function index()
     {
-        $data = KodeRekening::all();
+        $data = KodeRekening::orderBy('id', 'asc')->get();
         return response()->json($data);
     }
 
