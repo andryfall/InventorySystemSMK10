@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('riwayat_peminjaman', function (Blueprint $table) {
+        Schema::create('balance', function (Blueprint $table) {
             $table->id();
+            $table->decimal('amount', 15, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('riwayat_peminjaman');
+        Schema::dropIfExists('balance');
     }
 };

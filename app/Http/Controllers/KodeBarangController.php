@@ -51,7 +51,7 @@ class KodeBarangController extends Controller
         }
     
         array_pop($parts);
-        return implode('.', $parts) . '.'; // Rebuild parent kode
+        return implode('.', $parts) . '.';
     }
     
 
@@ -70,9 +70,9 @@ class KodeBarangController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'kode' => 'string|unique:kode_barangs,kode,' . $id,
+            'kode' => 'string|unique:kode_barang,kode,' . $id,
             'uraian' => 'string',
-            'parent_id' => 'nullable|exists:kode_barangs,id',
+            'parent_id' => 'nullable|exists:kode_barang,id',
         ]);
 
         $kodeBarang = KodeBarang::findOrFail($id);
@@ -82,7 +82,6 @@ class KodeBarangController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
@@ -119,10 +118,8 @@ class KodeBarangController extends Controller
     
             if (!$kode || !$uraian) continue;
     
-            // Determine level by counting periods (.)
             $level = substr_count(rtrim($kode, '.'), '.');
     
-            // Find the correct parent ID from the last known parent at the previous level
             $parentId = $level > 0 && isset($lastParents[$level - 1]) ? $lastParents[$level - 1] : null;
     
             if (KodeBarang::where('kode', $kode)->exists()) {
@@ -142,7 +139,6 @@ class KodeBarangController extends Controller
                 'updated_at' => now(),
             ]);
     
-            // Store the last inserted ID at the current level
             $lastParents[$level] = $item->id;
         }
     

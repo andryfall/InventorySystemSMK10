@@ -53,3 +53,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/aset/total-harga/current', [AssetItemController::class, 'totalHargaCurrentMonthYear']);
     Route::get('/aset/total-harga/{year}', [AssetItemController::class, 'totalHargaByYear']);
 });
+
+use App\Http\Controllers\BalanceController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/balance', [BalanceController::class, 'show']);
+    Route::post('/balance/update', [BalanceController::class, 'update']);
+    Route::post('/balance/add', action: [BalanceController::class, 'add']);
+});
+
+use App\Http\Controllers\KodeRekeningController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/kode-rekening/import', [KodeRekeningController::class, 'import']);
+    Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
+    Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
+    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'delete']);
+});
+
+use App\Http\Controllers\BhpItemController;
+
+Route::post('/bhp/import', [BhpItemController::class, 'import']);
+Route::get('/bhp/index', [BhpItemController::class, 'index']);
+Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
+Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
+Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);

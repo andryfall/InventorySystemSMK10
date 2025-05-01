@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('kode_rekening', function (Blueprint $table) {
             $table->id();
+            $table->string('kode', 50)->unique();
+            $table->string('uraian', 250);
             $table->timestamps();
         });
     }

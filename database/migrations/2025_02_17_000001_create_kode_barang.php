@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('kode', 50)->unique();
             $table->string('uraian', 250);
-            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->unsignedBigInteger(column: 'parent_id')->nullable();
             $table->timestamps();
             $table->foreign('parent_id')->references('id')->on('kode_barang')->onDelete('cascade');
         });

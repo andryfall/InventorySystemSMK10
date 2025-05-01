@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AssetItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class AssetItemController extends Controller
 {
@@ -33,6 +35,8 @@ class AssetItemController extends Controller
                     'umur_ekonomis' => $asset->umur_ekonomis,
                     'nilai_perolehan' => $asset->nilai_perolehan,
                     'beban_penyusutan' => $asset->beban_penyusutan,
+                    'sumber_perolehan' => $asset->sumber_perolehan,
+                    'kondisi' => $asset->kondisi,
                     'created_at' => $asset->created_at,
                     'updated_at' => $asset->updated_at,
                 ];
@@ -58,6 +62,8 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'required|integer',
             'nilai_perolehan' => 'required|integer',
             'beban_penyusutan' => 'required|integer',
+            'sumber_perolehan' => 'required|string|max:50',
+            'kondisi' => 'required|string|max:50',
         ]);
     
         $kodeBarang = \App\Models\KodeBarang::where('kode', $validated['kode'])->firstOrFail();
@@ -102,6 +108,8 @@ class AssetItemController extends Controller
                 'umur_ekonomis' => $asset->umur_ekonomis,
                 'nilai_perolehan' => $asset->nilai_perolehan,
                 'beban_penyusutan' => $asset->beban_penyusutan,
+                'kondisi' => $asset->kondisi,
+                'sumber_perolehan' => $asset->sumber_perolehan,
                 'created_at' => $asset->created_at,
                 'updated_at' => $asset->updated_at,
             ]
@@ -128,6 +136,8 @@ class AssetItemController extends Controller
             'umur_ekonomis' => 'sometimes|integer',
             'nilai_perolehan' => 'sometimes|integer',
             'beban_penyusutan' => 'sometimes|integer',
+            'sumber_perolehan' => 'sometimes|string|max:50',
+            'kondisi' => 'required|string|max:50',
         ]);
     
         if ($request->has('kode')) {
@@ -166,11 +176,13 @@ class AssetItemController extends Controller
     {
         $totalMonth = AssetItem::whereYear('tanggal_pembelian', now()->year)
             ->whereMonth('tanggal_pembelian', now()->month)
-            ->sum('harga');
-
+            ->select(DB::raw('SUM(jumlah * harga) as total'))
+            ->value('total');
+    
         $totalYear = AssetItem::whereYear('tanggal_pembelian', now()->year)
-            ->sum('harga');
-
+            ->select(DB::raw('SUM(jumlah * harga) as total'))
+            ->value('total');
+    
         return response()->json([
             'total_harga_current_month' => $totalMonth,
             'total_harga_current_year' => $totalYear

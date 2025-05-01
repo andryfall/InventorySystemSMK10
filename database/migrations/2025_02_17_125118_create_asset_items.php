@@ -28,6 +28,8 @@ return new class extends Migration
             $table->string('status', 8);
             $table->integer('nilai_perolehan');
             $table->integer('beban_penyusutan');
+            $table->string('kondisi', 50);
+            $table->string('sumber_perolehan', 50);
             $table->timestamps();
         });
 

@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lokasi;
+use Illuminate\Support\Facades\Storage;
 
 class LokasiController extends Controller
 {
     /**
-     * menampilkan seluruh lokasi.
+     * Display all lokasi.
      */
     public function index()
     {
@@ -17,13 +18,19 @@ class LokasiController extends Controller
     }
 
     /**
-     * Store a new lokasi in the database.
+     * Store a new lokasi in the database with an image.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_gedung' => 'required|string|max:50',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('lokasi_images', 'public');
+            $validated['image'] = $imagePath;
+        }
 
         $lokasi = Lokasi::create($validated);
 
@@ -34,7 +41,7 @@ class LokasiController extends Controller
     }
 
     /**
-     * menampilkan lokasi sesuai id.
+     * Show lokasi by id.
      */
     public function show($id)
     {
@@ -43,15 +50,25 @@ class LokasiController extends Controller
     }
 
     /**
-     * Update lokasi sesuai id.
+     * Update lokasi with an image.
      */
     public function update(Request $request, $id)
     {
+        $lokasi = Lokasi::findOrFail($id);
+
         $validated = $request->validate([
             'nama_gedung' => 'required|string|max:50',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $lokasi = Lokasi::findOrFail($id);
+        if ($request->hasFile('image')) {
+            if ($lokasi->image) {
+                Storage::disk('public')->delete($lokasi->image);
+            }
+            $imagePath = $request->file('image')->store('lokasi_images', 'public');
+            $validated['image'] = $imagePath;
+        }
+
         $lokasi->update($validated);
 
         return response()->json([
@@ -61,16 +78,24 @@ class LokasiController extends Controller
     }
 
     /**
-     * Hapus lokasi sesuai id.
+     * Delete lokasi by id.
      */
     public function destroy($id)
     {
         $lokasi = Lokasi::findOrFail($id);
+
+        if ($lokasi->image) {
+            Storage::disk('public')->delete($lokasi->image);
+        }
+
         $lokasi->delete();
 
         return response()->json(['message' => 'Lokasi deleted successfully']);
     }
-    
+
+    /**
+     * Count total lokasi.
+     */
     public function totalLokasi()
     {
         $total = Lokasi::count();

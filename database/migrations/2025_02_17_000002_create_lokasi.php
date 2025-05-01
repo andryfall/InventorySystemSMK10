@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('lokasi', function (Blueprint $table) {
             $table->id();
             $table->string('nama_gedung', 50);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

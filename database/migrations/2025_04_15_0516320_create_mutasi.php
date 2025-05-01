@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('mutasi', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('mutasi_penambahan_id');
-    $table->unsignedBigInteger('mutasi_pengurangan_id');
+            $table->foreignId('bhp_item_id')->constrained('bhp_items')->onDelete('cascade');
+            $table->enum('type', ['add', 'remove']);
+            $table->integer('quantity');
+            $table->string('taker_name')->nullable();
             $table->timestamps();
         });
     }
