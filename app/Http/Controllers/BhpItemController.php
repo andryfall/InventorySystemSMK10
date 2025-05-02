@@ -48,6 +48,42 @@ class BhpItemController extends Controller
         return response()->json($items);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama_barang'     => 'required|string|max:255',
+            'kode_rekening'   => 'required|exists:kode_rekening,kode',
+            'merk'            => 'required|string|max:255',
+            'volume'          => 'required|integer|min:1',
+            'satuan'          => 'required|string|max:100',
+            'harga'           => 'required|integer|min:0',
+        ]);
+
+        $kodeRekening = KodeRekening::where('kode', $validated['kode_rekening'])->firstOrFail();
+
+        $item = BhpItem::create([
+            'nama_barang'     => $validated['nama_barang'],
+            'kode_rekening_id'=> $kodeRekening->id,
+            'merk'            => $validated['merk'],
+            'volume'          => $validated['volume'],
+            'satuan'          => $validated['satuan'],
+            'harga'           => $validated['harga'],
+        ]);
+
+        Mutasi::create([
+            'bhp_item_id' => $item->id,
+            'quantity'    => $validated['volume'],
+            'type'        => 'add',
+            'created_at'  => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'BHP item added successfully.',
+            'item'    => $item
+        ], 201);
+    }
+
+
     public function import(Request $request)
     {
         $request->validate([

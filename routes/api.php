@@ -66,6 +66,7 @@ use App\Http\Controllers\KodeRekeningController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/kode-rekening/import', [KodeRekeningController::class, 'import']);
+    Route::post('/kode-rekening', [KodeRekeningController::class, 'store']);
     Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
     Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
     Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'destroy']);
@@ -75,6 +76,7 @@ use App\Http\Controllers\BhpItemController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
+    Route::post('/bhp', [BhpItemController::class, 'store']);
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
