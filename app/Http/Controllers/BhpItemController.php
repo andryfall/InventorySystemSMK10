@@ -215,4 +215,48 @@ class BhpItemController extends Controller
     }
 
 
+    public function totalJumlahAkhirByYear($year)
+    {
+        $totalYear = BhpItem::selectRaw("
+            SUM(
+                (
+                    SELECT COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0)
+                    FROM mutasi
+                    WHERE mutasi.bhp_item_id = bhp_items.id
+                      AND DATE_PART('year', mutasi.created_at) <= ?
+                ) * harga
+            ) AS total
+        ", [$year])->value('total');
+    
+        $rawMonthly = DB::table('mutasi')
+            ->join('bhp_items', 'mutasi.bhp_item_id', '=', 'bhp_items.id')
+            ->selectRaw("
+                DATE_PART('month', mutasi.created_at) as month,
+                SUM(
+                    (CASE WHEN mutasi.type = 'add' THEN mutasi.quantity ELSE -mutasi.quantity END) * bhp_items.harga
+                ) as total
+            ")
+            ->whereRaw("DATE_PART('year', mutasi.created_at) = ?", [$year])
+            ->groupByRaw("DATE_PART('month', mutasi.created_at)")
+            ->orderByRaw("DATE_PART('month', mutasi.created_at)")
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [str_pad($item->month, 2, '0', STR_PAD_LEFT) => $item->total];
+            });
+    
+        $monthlyTotals = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $key = str_pad($m, 2, '0', STR_PAD_LEFT);
+            $monthlyTotals[$key] = $rawMonthly[$key] ?? 0;
+        }
+    
+        return response()->json([
+            'year' => $year,
+            'total_jumlah_akhir_year' => $totalYear ?? 0,
+            'monthly_totals' => $monthlyTotals
+        ], 200);
+    }
+    
+    
+    
 }

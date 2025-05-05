@@ -81,4 +81,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
     Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
+    Route::get('/bhp/total-harga/{year}', [BhpItemController::class, 'totalJumlahAkhirByYear']);
 });
