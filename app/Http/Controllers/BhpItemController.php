@@ -208,6 +208,7 @@ class BhpItemController extends Controller
                     'Peminjam'        => $log->taker_name,
                     'Jumlah Barang'   => $log->quantity,
                     'Total'           => $log->quantity * $log->bhpItem->harga,
+                    'tanggal'         => $log->created_at,
                 ];
             });
 
