@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 
 class BhpItemController extends Controller
 {
@@ -278,6 +283,65 @@ class BhpItemController extends Controller
         return response()->json(['total_stock_akhir' => $totalStock]);
     }
 
-    
+    public function exportBhpItems()
+    {
+        $items = BhpItem::with('kodeRekening')->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray([
+            'No',
+            'Nama Barang',
+            'Kode Rekening',
+            'Merk',
+            'Tanggal',
+            'Stock Awal',
+            'Satuan',
+            'Stock Akhir',
+            'Harga Satuan',
+            'Jumlah Awal',
+            'Jumlah Akhir'
+        ], null, 'A1');
+
+        $rowNum = 2;
+        $counter = 1;
+
+        foreach ($items as $item) {
+            $stockAwal = $item->mutasi()
+                ->whereDate('created_at', '<', now()->startOfMonth())
+                ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+                ->value('total') ?? 0;
+
+            $stockAkhir = $item->mutasi()
+                ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+                ->value('total') ?? 0;
+
+            $sheet->fromArray([
+                $counter++,
+                $item->nama_barang,
+                $item->kodeRekening->kode ?? '',
+                $item->merk,
+                $item->updated_at->format('Y-m-d'),
+                $stockAwal,
+                $item->satuan,
+                $stockAkhir,
+                $item->harga,
+                $stockAwal * $item->harga,
+                $stockAkhir * $item->harga,
+            ], null, 'A' . $rowNum++);        
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        $filename = 'BHP_Items_Export.xlsx';
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
     
 }

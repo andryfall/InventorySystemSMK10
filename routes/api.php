@@ -84,4 +84,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bhp/total-harga/{year}', [BhpItemController::class, 'totalJumlahAkhirByYear']);
     Route::get('/bhp/total-peminjam', [BhpItemController::class, 'totalUniquePeminjam']);
     Route::get('/bhp/total-bhp', [BhpItemController::class, 'totalStockAkhir']);
+    Route::get('/bhp/export-bhp', [BhpItemController::class, 'exportBhpItems']);
 });
