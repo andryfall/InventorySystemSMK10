@@ -258,6 +258,26 @@ class BhpItemController extends Controller
         ], 200);
     }
     
+    public function totalUniquePeminjam()
+    {
+        $total = Mutasi::where('type', 'remove')
+            ->distinct('taker_name')
+            ->count('taker_name');
+
+        return response()->json(['total_unique_peminjam' => $total]);
+    }
+
+    public function totalStockAkhir()
+    {
+        $items = BhpItem::withSum(['mutasi as stock_akhir' => function ($query) {
+            $query->select(DB::raw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0)"));
+        }], 'quantity')->get();
+
+        $totalStock = $items->sum('stock_akhir');
+
+        return response()->json(['total_stock_akhir' => $totalStock]);
+    }
+
     
     
 }
