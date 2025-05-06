@@ -77,7 +77,7 @@ use App\Http\Controllers\BhpItemController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
     Route::post('/bhp', action: [BhpItemController::class, 'store']);
-    Route::post('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
+    Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
