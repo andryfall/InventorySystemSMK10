@@ -343,5 +343,29 @@ class BhpItemController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ]);
     }
+
+    public function destroy($id)
+    {
+        $item = BhpItem::findOrFail($id);
+
+        $hasRemovals = Mutasi::where('bhp_item_id', $id)
+            ->where('type', 'remove')
+            ->exists();
+
+        if ($hasRemovals) {
+            return response()->json([
+                'message' => 'Cannot delete item that has already been removed before.'
+            ], 400);
+        }
+
+        Mutasi::where('bhp_item_id', $id)->delete();
+
+        $item->delete();
+
+        return response()->json([
+            'message' => 'BHP item deleted successfully.'
+        ]);
+    }
+
     
 }
