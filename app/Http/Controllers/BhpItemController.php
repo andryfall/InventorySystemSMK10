@@ -66,26 +66,45 @@ class BhpItemController extends Controller
 
         $kodeRekening = KodeRekening::where('kode', $validated['kode_rekening'])->firstOrFail();
 
-        $item = BhpItem::create([
-            'nama_barang'     => $validated['nama_barang'],
-            'kode_rekening_id'=> $kodeRekening->id,
-            'merk'            => $validated['merk'],
-            'volume'          => $validated['volume'],
-            'satuan'          => $validated['satuan'],
-            'harga'           => $validated['harga'],
-        ]);
+        DB::beginTransaction();
+        try {
+            $item = BhpItem::where('nama_barang', $validated['nama_barang'])
+                ->where('kode_rekening_id', $kodeRekening->id)
+                ->where('merk', $validated['merk'])
+                ->where('satuan', $validated['satuan'])
+                ->where('harga', $validated['harga'])
+                ->first();
 
-        Mutasi::create([
-            'bhp_item_id' => $item->id,
-            'quantity'    => $validated['volume'],
-            'type'        => 'add',
-            'created_at'  => now(),
-        ]);
+            if ($item) {
+                $item->total_volume += $validated['volume'];
+                $item->save();
+            } else {
+                $item = BhpItem::create([
+                    'nama_barang'     => $validated['nama_barang'],
+                    'kode_rekening_id'=> $kodeRekening->id,
+                    'merk'            => $validated['merk'],
+                    'satuan'          => $validated['satuan'],
+                    'harga'           => $validated['harga'],
+                    'total_volume'    => $validated['volume'],
+                ]);
+            }
 
-        return response()->json([
-            'message' => 'BHP item added successfully.',
-            'item'    => $item
-        ], 201);
+            Mutasi::create([
+                'bhp_item_id' => $item->id,
+                'quantity'    => $validated['volume'],
+                'type'        => 'add',
+                'created_at'  => now(),
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'message' => 'BHP item added successfully.',
+                'item'    => $item
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Add item failed', 'error' => $e->getMessage()], 500);
+        }
     }
 
 
