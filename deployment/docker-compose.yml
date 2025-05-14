@@ -12,6 +12,7 @@ services:
       - postgres
     networks:
       - laravel_network
+      - caddy_net
 
   postgres:
     image: postgres:15
@@ -41,9 +42,13 @@ services:
       - app
     networks:
       - laravel_network 
+      - caddy_net
 
 networks:
   laravel_network:
+  caddy_net:
+    external: true
+  # Define a network for Caddy to use
   
 volumes:
   postgres_data:
