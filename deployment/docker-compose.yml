@@ -12,7 +12,7 @@ services:
       - postgres
     networks:
       - laravel_network
-      - caddy_net
+      - caddy_net       # ✅ Benar, di bawah service
 
   postgres:
     image: postgres:15
@@ -29,11 +29,25 @@ services:
     networks:
       - laravel_network
 
-  networks:
-    laravel_network:
-    caddy_net:
-      external: true
-    # Define a network for Caddy to use
-    
-  volumes:
-    db_data:
+  nginx:
+    image: nginx:latest
+    container_name: laravel_inventory_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www
+    depends_on:
+      - app
+    networks:
+      - laravel_network 
+      - caddy_net
+
+networks:
+  laravel_network: {}
+  caddy_net:
+    external: true
+
+volumes:
+  postgres_data: {}
