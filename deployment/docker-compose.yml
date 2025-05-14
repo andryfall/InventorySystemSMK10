@@ -1,7 +1,10 @@
 services:
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
     container_name: laravel_inventory_smkn10
+    image: laravel-inventory:latest
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -12,7 +15,7 @@ services:
       - postgres
     networks:
       - laravel_network
-      - caddy_net       # ✅ Benar, di bawah service
+      - caddy_net
 
   postgres:
     image: postgres:15
@@ -28,7 +31,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - laravel_network
-      
+
 networks:
   laravel_network: {}
   caddy_net:
