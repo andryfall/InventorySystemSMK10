@@ -44,11 +44,12 @@ services:
       - laravel_network 
       - caddy_net
 
-networks:
-  laravel_network:
-  caddy_net:
-    external: true
-  # Define a network for Caddy to use
-  
-volumes:
+  networks:
+    laravel_network:
+    caddy_net:
+      external: true
+    # Define a network for Caddy to use
+    
+  volumes:
+    db_data:
   postgres_data:
