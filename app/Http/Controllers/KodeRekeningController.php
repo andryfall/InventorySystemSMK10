@@ -79,4 +79,13 @@ class KodeRekeningController extends Controller
         return response()->json(['message' => 'Import successful']);
     }
 
+    public function destroyAll()
+    {
+        KodeRekening::truncate();
+
+        return response()->json([
+            'message' => 'All Kode Barang records deleted successfully'
+        ]);
+    }
+
 }

@@ -101,4 +101,13 @@ class LokasiController extends Controller
         $total = Lokasi::count();
         return response()->json(['total_lokasi' => $total], 200);
     }
+
+    public function destroyAll()
+    {
+        Lokasi::truncate();
+
+        return response()->json([
+            'message' => 'All Kode Barang records deleted successfully'
+        ]);
+    }
 }

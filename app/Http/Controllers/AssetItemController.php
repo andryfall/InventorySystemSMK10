@@ -56,13 +56,13 @@ class AssetItemController extends Controller
             'jumlah' => 'required|integer',
             'harga' => 'required|integer',
             'tanggal_pembelian' => 'required|date',
-            'no_spk_faktur_kuitansi' => 'required|string|max:50',
-            'kode_rekening_belanja' => 'required|string|max:50',
-            'no_bast' => 'required|string|max:50',
+            'no_spk_faktur_kuitansi' => 'sometimes|string|max:50',
+            'kode_rekening_belanja' => 'sometimes|string|max:50',
+            'no_bast' => 'sometimes|string|max:50',
             'umur_ekonomis' => 'required|integer',
             'nilai_perolehan' => 'required|integer',
             'beban_penyusutan' => 'required|integer',
-            'sumber_perolehan' => 'required|string|max:50',
+            'sumber_perolehan' => 'sometimes|string|max:50',
             'kondisi' => 'required|string|max:50',
         ]);
     
@@ -209,6 +209,14 @@ class AssetItemController extends Controller
         ], 200);
     }
     
+    public function destroyAll()
+    {
+        AssetItem::truncate();
+
+        return response()->json([
+            'message' => 'All Kode Barang records deleted successfully'
+        ]);
+    }
 
 
 }

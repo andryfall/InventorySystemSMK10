@@ -386,5 +386,14 @@ class BhpItemController extends Controller
         ]);
     }
 
+    public function destroyAll()
+    {
+        BhpItem::truncate();
+
+        return response()->json([
+            'message' => 'All Kode Barang records deleted successfully'
+        ]);
+    }
+
     
 }

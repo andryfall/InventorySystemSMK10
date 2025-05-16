@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lokasi/{id}/show', [LokasiController::class, 'show']);
     Route::put('/lokasi/{id}', [LokasiController::class, 'update']);
     Route::delete('/lokasi/{id}', [LokasiController::class, 'destroy']);
+    Route::delete('/lokasi/delete-all', [LokasiController::class, 'destroyAll']);
     Route::get('/lokasi/total', [LokasiController::class, 'totalLokasi']);
 });
 
@@ -36,7 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/kode-barang/{id}/show', [KodeBarangController::class, 'show']);
     Route::post('/kode-barang', [KodeBarangController::class, 'store']);
     Route::put('/kode-barang/{id}', [KodeBarangController::class, 'update']);
+    Route::delete('/kode-barang/destroy-all', [KodeBarangController::class, 'destroyAll']);
     Route::delete('/kode-barang/{id}', [KodeBarangController::class, 'destroy']);
+    
     Route::post('/kode-barang/import', [KodeBarangController::class, 'importFile']);
     Route::get('/kode-barang/total', [KodeBarangController::class, 'totalKodeBarang']);
 });
@@ -49,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/aset', [AssetItemController::class, 'store']);
     Route::put('/aset/{id}', [AssetItemController::class, 'update']);
     Route::delete('/aset/{id}', [AssetItemController::class, 'destroy']);
+    Route::delete('/aset/destroy-all', [AssetItemController::class, 'destroyAll']);
     Route::get('/aset/total', [AssetItemController::class, 'totalAssets']);
     Route::get('/aset/total-harga/current', [AssetItemController::class, 'totalHargaCurrentMonthYear']);
     Route::get('/aset/total-harga/{year}', [AssetItemController::class, 'totalHargaByYear']);
@@ -70,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
     Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
     Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'destroy']);
+    Route::delete('/kode-rekening/destroy-all', [KodeRekeningController::class, 'destroyAll']);
 });
 
 use App\Http\Controllers\BhpItemController;
@@ -78,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
     Route::post('/bhp', action: [BhpItemController::class, 'store']);
     Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
+    Route::delete('/bhp/destroy-all', action: [BhpItemController::class, 'destroyAll']);
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
@@ -86,4 +92,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bhp/total-peminjam', [BhpItemController::class, 'totalUniquePeminjam']);
     Route::get('/bhp/total-bhp', [BhpItemController::class, 'totalStockAkhir']);
     Route::get('/bhp/export-bhp', [BhpItemController::class, 'exportBhpItems']);
+    
 });

@@ -153,5 +153,16 @@ class KodeBarangController extends Controller
         $total = KodeBarang::count();
         return response()->json(['total_kodebarang' => $total], 200);
     }
-    
+
+    /**
+     * Delete all KodeBarang records.
+     */
+    public function destroyAll()
+    {
+        KodeBarang::truncate();
+
+        return response()->json([
+            'message' => 'All Kode Barang records deleted successfully'
+        ]);
+    }
 }
