@@ -51,8 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/aset/{id}/show', [AssetItemController::class, 'show']);
     Route::post('/aset', [AssetItemController::class, 'store']);
     Route::put('/aset/{id}', [AssetItemController::class, 'update']);
-    Route::delete('/aset/{id}', [AssetItemController::class, 'destroy']);
     Route::delete('/aset/destroy-all', [AssetItemController::class, 'destroyAll']);
+    Route::delete('/aset/{id}', [AssetItemController::class, 'destroy']);
+    
     Route::get('/aset/total', [AssetItemController::class, 'totalAssets']);
     Route::get('/aset/total-harga/current', [AssetItemController::class, 'totalHargaCurrentMonthYear']);
     Route::get('/aset/total-harga/{year}', [AssetItemController::class, 'totalHargaByYear']);
@@ -73,8 +74,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/kode-rekening', [KodeRekeningController::class, 'store']);
     Route::get('/kode-rekening/index', [KodeRekeningController::class, 'index']);
     Route::put('/kode-rekening/{id}', [KodeRekeningController::class, 'update']);
-    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'destroy']);
     Route::delete('/kode-rekening/destroy-all', [KodeRekeningController::class, 'destroyAll']);
+    Route::delete('/kode-rekening/{id}', [KodeRekeningController::class, 'destroy']);
+    
 });
 
 use App\Http\Controllers\BhpItemController;
@@ -82,8 +84,9 @@ use App\Http\Controllers\BhpItemController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
     Route::post('/bhp', action: [BhpItemController::class, 'store']);
-    Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
     Route::delete('/bhp/destroy-all', action: [BhpItemController::class, 'destroyAll']);
+    Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
+    
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
