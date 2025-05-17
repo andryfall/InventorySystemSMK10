@@ -11,7 +11,9 @@ class AssetItemController extends Controller
 {
     public function index()
     {
-        $assets = AssetItem::with(['kodeBarang.parent.parent'])->get();
+            $assets = AssetItem::with(['kodeBarang.parent.parent'])
+            ->where('jumlah', '>', 0)
+            ->get();
     
         return response()->json([
             'data' => $assets->map(function ($asset) {
