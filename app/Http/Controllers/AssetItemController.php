@@ -59,9 +59,9 @@ class AssetItemController extends Controller
             'no_spk_faktur_kuitansi' => 'sometimes|string|max:50',
             'kode_rekening_belanja' => 'sometimes|string|max:50',
             'no_bast' => 'sometimes|string|max:50',
-            'umur_ekonomis' => 'required|integer',
-            'nilai_perolehan' => 'required|integer',
-            'beban_penyusutan' => 'required|integer',
+            'umur_ekonomis' => 'sometimes|integer',
+            'nilai_perolehan' => 'sometimes|integer',
+            'beban_penyusutan' => 'sometimes|integer',
             'sumber_perolehan' => 'sometimes|string|max:50',
             'kondisi' => 'required|string|max:50',
         ]);

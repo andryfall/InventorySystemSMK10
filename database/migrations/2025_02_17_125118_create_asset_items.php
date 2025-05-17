@@ -20,14 +20,14 @@ return new class extends Migration
             $table->integer('jumlah');
             $table->integer('harga');
             $table->date('tanggal_pembelian');
-            $table->string('no_spk_faktur_kuitansi', 50);
-            $table->string('kode_rekening_belanja', 50);
-            $table->string('no_bast', 50);
-            $table->integer('umur_ekonomis');
-            $table->integer('nilai_perolehan');
-            $table->integer('beban_penyusutan');
+            $table->string('no_spk_faktur_kuitansi', 50)->nullable();
+            $table->string('kode_rekening_belanja', 50)->nullable();
+            $table->string('no_bast', 50)->nullable();
+            $table->integer('umur_ekonomis')->nullable();
+            $table->integer('nilai_perolehan')->nullable();
+            $table->integer('beban_penyusutan')->nullable();
             $table->string('kondisi', 50);
-            $table->string('sumber_perolehan', 50);
+            $table->string('sumber_perolehan', 50)->nullable();
             $table->timestamps();
         });
     }
