@@ -81,7 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 use App\Http\Controllers\BhpItemController;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(callback: function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
     Route::post('/bhp', action: [BhpItemController::class, 'store']);
     Route::delete('/bhp/destroy-all', action: [BhpItemController::class, 'destroyAll']);
@@ -96,4 +96,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bhp/total-bhp', [BhpItemController::class, 'totalStockAkhir']);
     Route::get('/bhp/export-bhp', [BhpItemController::class, 'exportBhpItems']);
     
+});
+
+use App\Http\Controllers\PeminjamanAsetController;
+
+Route::middleware('auth:sanctum')->group(callback: function () {
+    Route::get('/peminjaman-aset', [PeminjamanAsetController::class, 'index']);
+    Route::post('/peminjaman-aset/{id}', [PeminjamanAsetController::class, 'store']);
+    Route::get('/peminjaman-aset/{id}', [PeminjamanAsetController::class, 'show']);
+    Route::put('/peminjaman-aset/{id}', [PeminjamanAsetController::class, 'update']);
+    Route::delete('/peminjaman-aset', action: [PeminjamanAsetController::class, 'destroyAll']);
+    Route::delete('/peminjaman-aset/{id}', [PeminjamanAsetController::class, 'destroy']);
+    Route::post('/peminjaman-aset/{id}/kembalikan', [PeminjamanAsetController::class, 'kembalikan']);
 });

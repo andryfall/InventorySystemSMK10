@@ -10,6 +10,7 @@ class AssetItem extends Model
     use HasFactory;
 
     protected $primaryKey = 'aset';
+    public $incrementing = true;
 
     protected $fillable = [
         'kode_barang_id',
@@ -40,5 +41,10 @@ class AssetItem extends Model
     public function lokasi()
     {
         return $this->belongsTo(Lokasi::class);
+    }
+
+    public function peminjaman()
+    {
+        return $this->hasMany(PeminjamanAset::class);
     }
 }
