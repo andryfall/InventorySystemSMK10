@@ -391,6 +391,16 @@ class BhpItemController extends Controller
         BhpItem::truncate();
 
         return response()->json([
+            'message' => 'All BHaP records deleted successfully'
+        ]);
+    }
+
+    
+    public function destroyAllRiwayat()
+    {
+        Mutasi::truncate();
+
+        return response()->json([
             'message' => 'All Kode Barang records deleted successfully'
         ]);
     }
