@@ -84,12 +84,13 @@ use App\Http\Controllers\BhpItemController;
 Route::middleware('auth:sanctum')->group(callback: function () {
     Route::post('/bhp/import', [BhpItemController::class, 'import']);
     Route::post('/bhp', action: [BhpItemController::class, 'store']);
+    Route::delete('/bhp/destroy-all-riwayat', action: [BhpItemController::class, 'destroyAllRiwayat']);
     Route::delete('/bhp/destroy-all', action: [BhpItemController::class, 'destroyAll']);
     Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
     
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
-    Route::delete('/bhp/destroy-all-riwayat', action: [BhpItemController::class, 'destroyAllRiwayat']);
+    
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
     Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
     Route::get('/bhp/total-harga/{year}', [BhpItemController::class, 'totalJumlahAkhirByYear']);

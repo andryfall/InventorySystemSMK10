@@ -84,7 +84,7 @@ class KodeRekeningController extends Controller
         KodeRekening::truncate();
 
         return response()->json([
-            'message' => 'All Kode Barang records deleted successfully'
+            'message' => 'All Kode Rekening records deleted successfully'
         ]);
     }
 

@@ -216,7 +216,7 @@ class AssetItemController extends Controller
         AssetItem::truncate();
 
         return response()->json([
-            'message' => 'All Kode Barang records deleted successfully'
+            'message' => 'All Asset records deleted successfully'
         ]);
     }
 

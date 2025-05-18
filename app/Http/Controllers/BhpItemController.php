@@ -391,7 +391,7 @@ class BhpItemController extends Controller
         BhpItem::truncate();
 
         return response()->json([
-            'message' => 'All BHaP records deleted successfully'
+            'message' => 'All BHP records deleted successfully'
         ]);
     }
 
@@ -401,7 +401,7 @@ class BhpItemController extends Controller
         Mutasi::truncate();
 
         return response()->json([
-            'message' => 'All Kode Barang records deleted successfully'
+            'message' => 'All Riwayat records deleted successfully'
         ]);
     }
 

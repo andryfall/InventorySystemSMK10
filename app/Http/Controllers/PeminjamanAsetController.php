@@ -77,12 +77,18 @@ class PeminjamanAsetController extends Controller
         $peminjaman = PeminjamanAset::findOrFail($id);
 
         if ($peminjaman->status === 'dipinjam' || $peminjaman->status === 'diambil') {
-            $assetItem = $peminjaman->assetItem;
+            $assetItem = AssetItem::find($peminjaman->asset_item_id);
+
+            if (!$assetItem) {
+                return response()->json(['error' => 'Asset item tidak ditemukan.'], 404);
+            }
+
             $assetItem->jumlah += $peminjaman->volume;
             $assetItem->save();
         }
 
         $peminjaman->delete();
+
         return response()->json(['message' => 'Data peminjaman dihapus.']);
     }
 
