@@ -3,39 +3,53 @@ services:
     build:
       context: ..
       dockerfile: deployment/Dockerfile
-    container_name: laravel_inventory_smkn10
-    image: laravel-inventory:latest
+    image: inventaris-backend:latest
+    container_name: backend-inventaris_app
     restart: unless-stopped
-    working_dir: /var/www
-    volumes:
-      - .:/var/www
     ports:
-      - "8000:8000"
+      - "8888:80"
+    environment:
+      - APP_NAME=inventaris
+      - APP_ENV=local
+      - APP_KEY=
+      - APP_DEBUG=true
+      - APP_TIMEZONE=Asia/Jakarta
+      - APP_URL=https://api-inventaris.matradipti.org
+      - DB_CONNECTION=pgsql
+      - DB_HOST=inventaris_db
+      - DB_PORT=5432
+      - DB_DATABASE=inventaris
+      - DB_USERNAME=admin
+      - DB_PASSWORD=inventory
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
     depends_on:
-      - postgres
+      - inventaris_db
     networks:
-      - laravel_network
+      - inventaris-network
       - caddy_net
 
-  postgres:
+  inventaris_db:
     image: postgres:15
-    container_name: inventory_smkn10_postgres
+    container_name: inventaris_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: inventory
-      POSTGRES_USER: haidar
-      POSTGRES_PASSWORD: 'inventory10&24'
+      - POSTGRES_DB=inventaris
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=inventory
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     networks:
-      - laravel_network
-
-networks:
-  laravel_network: {}
-  caddy_net:
-    external: true
+      - inventaris-network
 
 volumes:
-  postgres_data: {}
+  postgres_data:
+
+networks:
+  inventaris-network:
+    driver: bridge
+  caddy_net:
+    external: true
