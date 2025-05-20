@@ -18,36 +18,42 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 class BhpItemController extends Controller
 {
 
-    public function index()
-    {
-        $startOfCurrentMonth = Carbon::now()->startOfMonth();
-    
-        $items = BhpItem::with('kodeRekening')
-            ->get()
-            ->map(function ($item) use ($startOfCurrentMonth) {
-                $stockAwal = $item->mutasi()
-                    ->where('created_at', '<', $startOfCurrentMonth)
-                    ->select(DB::raw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) as total"))
-                    ->value('total');
-    
-                return [
-                    'id'            => $item->id,
-                    'Nama Barang'   => $item->nama_barang,
-                    'Kode Rekening' => $item->kodeRekening->kode ?? '-',
-                    'Merk'          => $item->merk,
-                    'Tanggal'       => $item->updated_at->toDateString(),
-                    'Stock Awal'    => $stockAwal,
-                    'Stock Akhir'   => $item->total_volume,
-                    'Harga Satuan'  => $item->harga,
-                    'Jumlah Awal'   => $stockAwal * $item->harga,
-                    'Jumlah Akhir'  => $item->total_volume * $item->harga,
-                ];
-            })
-            ->sortBy('id')
-            ->values();
-    
-        return response()->json($items);
-    }
+public function index()
+{
+    $startOfCurrentMonth = Carbon::now()->startOfMonth();
+
+    // Get all stock awal for all items in a single query
+    $stockAwalMap = DB::table('mutasi')
+        ->select('bhp_item_id', DB::raw("SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END) as total"))
+        ->where('created_at', '<', $startOfCurrentMonth)
+        ->groupBy('bhp_item_id')
+        ->pluck('total', 'bhp_item_id'); // [item_id => stockAwal]
+
+    // Load all items with relationships
+    $items = BhpItem::with('kodeRekening')
+        ->get()
+        ->map(function ($item) use ($stockAwalMap) {
+            $stockAwal = $stockAwalMap[$item->id] ?? 0;
+
+            return [
+                'id'            => $item->id,
+                'Nama Barang'   => $item->nama_barang,
+                'Kode Rekening' => $item->kodeRekening->kode ?? '-',
+                'Merk'          => $item->merk,
+                'Tanggal'       => $item->updated_at->toDateString(),
+                'Stock Awal'    => $stockAwal,
+                'Stock Akhir'   => $item->total_volume,
+                'Harga Satuan'  => $item->harga,
+                'Jumlah Awal'   => $stockAwal * $item->harga,
+                'Jumlah Akhir'  => $item->total_volume * $item->harga,
+            ];
+        })
+        ->sortBy('id')
+        ->values();
+
+    return response()->json($items);
+}
+
 
     public function store(Request $request)
     {
