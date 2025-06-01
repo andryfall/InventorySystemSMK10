@@ -12,17 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bhp_items', function (Blueprint $table) {
-            $table->id('bhp');
+            $table->id();
+            $table->string('nama_barang');
             $table->foreignId('kode_rekening_id')->constrained('kode_rekening')->onDelete('cascade');
-            $table->foreignID('bhp_atribut_id')->constrained('bhp_atribut')->onDelete('cascade');
-            $table->foreignID('satuan_barang_id')->constrained('satuan_barang')->onDelete('cascade');
-            $table->foreignId('saldo_awal_id')->constrained('bhp_saldo_awal')->onDelete('cascade');
-            $table->foreignId('peminjam_id')->constrained('peminjam')->onDelete('cascade');
-            $table->foreignId('mutasi_id')->constrained('mutasi')->onDelete('cascade');
+            $table->string('merk');
+            $table->integer('harga');
+            $table->string('satuan');
+            $table->integer('total_volume')->default(0);
+            $table->integer('initial_volume')->default(0);
             $table->timestamps();
         });
+        
     }
-
     /**
      * Reverse the migrations.
      */
