@@ -365,6 +365,18 @@ public function exportBhpItems(Request $request)
 
     $items = BhpItem::with('kodeRekening')->get();
 
+    
+    $items = $items->sortBy(function ($item) {
+        return array_map('intval', explode('.', $item->kodeRekening->kode ?? ''));
+    })->values();
+
+    $carbonLocale = 'id';
+    Carbon::setLocale($carbonLocale);
+
+    $firstDay = Carbon::create($year, $month, 1);
+    $stockAwalDate = $firstDay->copy()->subDay()->translatedFormat('d F Y');
+    $stockAkhirDate = $firstDay->copy()->endOfMonth()->translatedFormat('d F Y');
+
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
 
@@ -373,13 +385,16 @@ public function exportBhpItems(Request $request)
         'Nama Barang',
         'Kode Rekening',
         'Merk',
-        'Tanggal',
-        'Stock Awal',
+        "Stock Awal $stockAwalDate",
         'Satuan',
-        'Stock Akhir',
         'Harga Satuan',
-        'Jumlah Awal',
-        'Jumlah Akhir'
+        "Jumlah Awal $stockAwalDate",
+        'penambahan',
+        'pengurangan',
+        "Stock Akhir $stockAkhirDate",
+        'Satuan',
+        'Harga Satuan',
+        "Jumlah Akhir $stockAkhirDate"
     ], null, 'A1');
 
     $rowNum = 2;
@@ -396,17 +411,30 @@ public function exportBhpItems(Request $request)
             ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
             ->value('total') ?? 0;
 
+        $penambahan = $item->mutasi()
+            ->where('created_at', '<', $endOfMonth)
+            ->where('type', 'add')
+            ->sum('quantity');
+        
+        $pengurangan = $item->mutasi()
+            ->where('created_at', '<', $endOfMonth)
+            ->where('type', 'remove')
+            ->sum('quantity');
+
         $sheet->fromArray([
             $counter++,
             $item->nama_barang,
             $item->kodeRekening->kode ?? '',
             $item->merk,
-            $endOfMonth->format('Y-m-d'),
             $stockAwal,
             $item->satuan,
-            $stockAkhir,
             $item->harga,
             $stockAwal * $item->harga,
+            $penambahan,
+            $pengurangan,
+            $stockAwal+$stockAkhir,
+            $item->satuan,
+            $item->harga,
             ($stockAwal + $stockAkhir) * $item->harga,
         ], null, 'A' . $rowNum++);
     }
