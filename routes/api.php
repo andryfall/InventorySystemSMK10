@@ -53,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/aset/{id}', [AssetItemController::class, 'update']);
     Route::delete('/aset/destroy-all', [AssetItemController::class, 'destroyAll']);
     Route::delete('/aset/{id}', [AssetItemController::class, 'destroy']);
-    
+    Route::post('/aset/import', [AssetItemController::class, 'import']);
     Route::get('/aset/total', [AssetItemController::class, 'totalAssets']);
     Route::get('/aset/total-harga/current', [AssetItemController::class, 'totalHargaCurrentMonthYear']);
     Route::get('/aset/total-harga/{year}', [AssetItemController::class, 'totalHargaByYear']);
@@ -94,6 +94,7 @@ Route::middleware('auth:sanctum')->group(callback: function () {
     Route::get('/bhp/indexsummary', [BhpItemController::class, 'getAllMonthlyStocks']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
     Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
+    Route::get('/bhp/mutasi', [BhpItemController::class, 'getMutasiLogs']);
     Route::get('/bhp/total-harga/{year}', [BhpItemController::class, 'totalJumlahAkhirByYear']);
     Route::get('/bhp/total-peminjam', [BhpItemController::class, 'totalUniquePeminjam']);
     Route::get('/bhp/total-bhp', [BhpItemController::class, 'totalStockAkhir']);

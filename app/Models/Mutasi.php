@@ -16,6 +16,7 @@ class Mutasi extends Model
         'type',
         'quantity',
         'taker_name',
+        'created_at',
     ];
 
     public function bhpItem()

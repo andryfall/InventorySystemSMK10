@@ -22,14 +22,12 @@ public function index()
 {
     $startOfCurrentMonth = Carbon::now()->startOfMonth();
 
-    // Get all stock awal for all items in a single query
     $stockAwalMap = DB::table('mutasi')
         ->select('bhp_item_id', DB::raw("SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END) as total"))
         ->where('created_at', '<', $startOfCurrentMonth)
         ->groupBy('bhp_item_id')
-        ->pluck('total', 'bhp_item_id'); // [item_id => stockAwal]
+        ->pluck('total', 'bhp_item_id');
 
-    // Load all items with relationships
     $items = BhpItem::with('kodeRekening')
         ->get()
         ->map(function ($item) use ($stockAwalMap) {
@@ -64,7 +62,18 @@ public function index()
             'volume'          => 'required|integer|min:1',
             'satuan'          => 'required|string|max:100',
             'harga'           => 'required|integer|min:0',
+            'tanggal'         => 'nullable|string',
         ]);
+        
+        $tanggal = now();
+
+        if (!empty($validated['tanggal'])) {
+            try {
+                $tanggal = Carbon::createFromFormat('m/d/Y', $validated['tanggal'])->startOfDay();
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Invalid tanggal format. Use m/d/Y'], 422);
+            }
+        }
 
         $kodeRekening = KodeRekening::where('kode', $validated['kode_rekening'])->firstOrFail();
 
@@ -95,7 +104,7 @@ public function index()
                 'bhp_item_id' => $item->id,
                 'quantity'    => $validated['volume'],
                 'type'        => 'add',
-                'created_at'  => now(),
+                'created_at'  => $tanggal,
             ]);
 
             DB::commit();
@@ -109,66 +118,81 @@ public function index()
         }
     }
 
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:xlsx,xls',
+    ]);
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls',
-        ]);
-    
-        $file = $request->file('file');
-        $spreadsheet = IOFactory::load($file);
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray();
-    
-        unset($rows[0]);
-    
-        DB::beginTransaction();
-        try {
-            foreach ($rows as $row) {
-                [$namaBarang, $kodeRekeningStr, $merk, $volume, $satuan, $harga] = $row;
-    
-                $kodeRekening = KodeRekening::where('kode', $kodeRekeningStr)->first();
-                if (!$kodeRekening) {
-                    throw new \Exception("Kode rekening not found: $kodeRekeningStr");
+    $file = $request->file('file');
+    $spreadsheet = IOFactory::load($file);
+    $sheet = $spreadsheet->getActiveSheet();
+    $rows = $sheet->toArray();
+
+    unset($rows[0]);
+
+    DB::beginTransaction();
+    try {
+        foreach ($rows as $index => $row) {
+            if (count(array_filter($row)) < 6) continue;
+
+            $tanggal = now();
+            if (isset($row[6]) && $row[6]) {
+                
+                try {
+                    $tanggal = Carbon::createFromFormat('m/d/Y', trim($row[6]))->startOfDay();
+                } catch (\Exception $e) {
+                    throw new \Exception("Invalid date format in row " . ($index + 2) . ": " . $row[6]);
                 }
-    
-                $item = BhpItem::where('nama_barang', $namaBarang)
-                    ->where('kode_rekening_id', $kodeRekening->id)
-                    ->where('merk', $merk)
-                    ->where('satuan', $satuan)
-                    ->where('harga', $harga)
-                    ->first();
-    
-                if ($item) {
-                    $item->total_volume += (int) $volume;
-                    $item->save();
-                } else {
-                    $item = BhpItem::create([
-                        'nama_barang' => $namaBarang,
-                        'kode_rekening_id' => $kodeRekening->id,
-                        'merk' => $merk,
-                        'satuan' => $satuan,
-                        'harga' => $harga,
-                        'total_volume' => (int) $volume,
-                    ]);
-                }
-    
-                Mutasi::create([
-                    'bhp_item_id' => $item->id,
-                    'quantity' => (int) $volume,
-                    'type' => 'add',
-                    'created_at' => now(),
+            }
+
+            [$namaBarang, $kodeRekeningStr, $merk, $volume, $satuan, $harga] = array_slice($row, 0, 6);
+
+            $kodeRekening = KodeRekening::where('kode', trim($kodeRekeningStr))->first();
+            if (!$kodeRekening) {
+                throw new \Exception("Kode rekening not found in row " . ($index + 2) . ": " . $kodeRekeningStr);
+            }
+
+            $item = BhpItem::where('nama_barang', trim($namaBarang))
+                ->where('kode_rekening_id', $kodeRekening->id)
+                ->where('merk', trim($merk))
+                ->where('satuan', trim($satuan))
+                ->where('harga', (int) $harga)
+                ->first();
+
+            if ($item) {
+                $item->total_volume += (int) $volume;
+                $item->save();
+            } else {
+                $item = BhpItem::create([
+                    'nama_barang'      => trim($namaBarang),
+                    'kode_rekening_id' => $kodeRekening->id,
+                    'merk'             => trim($merk),
+                    'satuan'           => trim($satuan),
+                    'harga'            => (int) $harga,
+                    'total_volume'     => (int) $volume,
                 ]);
             }
-    
-            DB::commit();
-            return response()->json(['message' => 'Items imported successfully.']);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 500);
+
+            Mutasi::create([
+                'bhp_item_id' => $item->id,
+                'quantity'    => (int) $volume,
+                'type'        => 'add',
+                'created_at'  => $tanggal,
+            ]);
         }
+
+        DB::commit();
+        return response()->json(['message' => 'Items imported successfully.']);
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Import failed',
+            'error'   => $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function remove(Request $request, $id)
     {
@@ -241,6 +265,28 @@ public function index()
         return response()->json($removals);
     }
 
+    public function getMutasiLogs()
+    {
+        $logs = Mutasi::where('type', 'add')
+            ->with(['bhpItem.koderekening'])
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'Id'              => $log->id,
+                    'Nama Barang'     => $log->bhpItem->nama_barang,
+                    'Kode Rekening'   => $log->bhpItem->koderekening->kode ?? '-',
+                    'Merk'            => $log->bhpItem->merk,
+                    'Peminjam'        => $log->taker_name,
+                    'Jumlah Barang'   => $log->quantity,
+                    'Total'           => $log->quantity * $log->bhpItem->harga,
+                    'tanggal'         => $log->created_at,
+                ];
+            });
+
+        return response()->json($logs);
+    }
+
 
     public function totalJumlahAkhirByYear($year)
     {
@@ -304,66 +350,79 @@ public function index()
         return response()->json(['total_stock_akhir' => $totalStock]);
     }
 
-    public function exportBhpItems()
-    {
-        $items = BhpItem::with('kodeRekening')->get();
+public function exportBhpItems(Request $request)
+{
+    $request->validate([
+        'month' => 'required|integer|min:1|max:12',
+        'year' => 'required|integer|min:1900',
+    ]);
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+    $month = $request->input('month');
+    $year = $request->input('year');
+
+    $startOfMonth = now()->setDate($year, $month, 1)->startOfMonth();
+    $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+    $items = BhpItem::with('kodeRekening')->get();
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $sheet->fromArray([
+        'No',
+        'Nama Barang',
+        'Kode Rekening',
+        'Merk',
+        'Tanggal',
+        'Stock Awal',
+        'Satuan',
+        'Stock Akhir',
+        'Harga Satuan',
+        'Jumlah Awal',
+        'Jumlah Akhir'
+    ], null, 'A1');
+
+    $rowNum = 2;
+    $counter = 1;
+
+    foreach ($items as $item) {
+        $stockAwal = $item->mutasi()
+            ->where('created_at', '<', $startOfMonth)
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+            ->value('total') ?? 0;
+
+        $stockAkhir = $item->mutasi()
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+            ->value('total') ?? 0;
 
         $sheet->fromArray([
-            'No',
-            'Nama Barang',
-            'Kode Rekening',
-            'Merk',
-            'Tanggal',
-            'Stock Awal',
-            'Satuan',
-            'Stock Akhir',
-            'Harga Satuan',
-            'Jumlah Awal',
-            'Jumlah Akhir'
-        ], null, 'A1');
-
-        $rowNum = 2;
-        $counter = 1;
-
-        foreach ($items as $item) {
-            $stockAwal = $item->mutasi()
-                ->whereDate('created_at', '<', now()->startOfMonth())
-                ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
-                ->value('total') ?? 0;
-
-            $stockAkhir = $item->mutasi()
-                ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
-                ->value('total') ?? 0;
-
-            $sheet->fromArray([
-                $counter++,
-                $item->nama_barang,
-                $item->kodeRekening->kode ?? '',
-                $item->merk,
-                $item->updated_at->format('Y-m-d'),
-                $stockAwal,
-                $item->satuan,
-                $stockAkhir,
-                $item->harga,
-                $stockAwal * $item->harga,
-                $stockAkhir * $item->harga,
-            ], null, 'A' . $rowNum++);        
-        }
-
-        $writer = new Xlsx($spreadsheet);
-
-        $filename = 'BHP_Items_Export.xlsx';
-
-        return new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');
-        }, 200, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ]);
+            $counter++,
+            $item->nama_barang,
+            $item->kodeRekening->kode ?? '',
+            $item->merk,
+            $endOfMonth->format('Y-m-d'),
+            $stockAwal,
+            $item->satuan,
+            $stockAkhir,
+            $item->harga,
+            $stockAwal * $item->harga,
+            ($stockAwal + $stockAkhir) * $item->harga,
+        ], null, 'A' . $rowNum++);
     }
+
+    $writer = new Xlsx($spreadsheet);
+
+    $filename = "BHP_Items_Export_{$year}_{$month}.xlsx";
+
+    return new StreamedResponse(function () use ($writer) {
+        $writer->save('php://output');
+    }, 200, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+    ]);
+}
+
 
     public function destroy($id)
     {

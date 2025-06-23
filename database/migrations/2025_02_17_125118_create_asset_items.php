@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('asset_items', function (Blueprint $table) {
             $table->id('aset');
             $table->foreignId('kode_barang_id')->constrained('kode_barang')->onDelete('cascade');
-            $table->foreignId('lokasi_id')->constrained('lokasi')->onDelete('cascade');
+            $table->foreignId('lokasi_id')->nullable()->constrained('lokasi')->onDelete('set null');
             $table->string('merk_barang', 250);
             $table->string('satuan', 8);
             $table->integer('jumlah');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('no_bast', 50)->nullable();
             $table->integer('umur_ekonomis')->nullable();
             $table->integer('nilai_perolehan')->nullable();
-            $table->integer('beban_penyusutan')->nullable();
+            $table->float('beban_penyusutan')->nullable();
             $table->string('kondisi', 50);
             $table->string('sumber_perolehan', 50)->nullable();
             $table->timestamps();
