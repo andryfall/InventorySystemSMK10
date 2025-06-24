@@ -42,4 +42,9 @@ class AssetItem extends Model
     {
         return $this->hasMany(PeminjamanAset::class);
     }
+
+    public function lokasi()
+    {
+        return $this->belongsTo(Lokasi::class);
+    }
 }

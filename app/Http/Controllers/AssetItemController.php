@@ -216,7 +216,7 @@ public function import(Request $request)
     
         $validated = $request->validate([
             'kode' => 'sometimes|string|exists:kode_barang,kode',
-            'nama_gedung' => 'required|exists:lokasi,nama_gedung',
+            'nama_gedung' => 'sometimes|exists:lokasi,nama_gedung',
             'merk_barang' => 'sometimes|string|max:250',
             'satuan' => 'sometimes|string|max:8',
             'jumlah' => 'sometimes|integer|min:1',
