@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \
     libicu-dev \
     libzip-dev \
+    libpq-dev   \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
