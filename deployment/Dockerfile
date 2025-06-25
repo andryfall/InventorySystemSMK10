@@ -15,7 +15,31 @@ RUN npm run build
 FROM php:8.2-fpm
 
 # Install dependencies - combined into a single layer with cleanup
-RUN apt-get update && apt-get install -y     nginx     supervisor     libonig-dev     libxml2-dev     libpng-dev     li>
+RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
+    libonig-dev \
+    libxml2-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libwebp-dev \
+    libicu-dev \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) \
+        pdo \
+        pdo_psgl \
+        mbstring \
+        xml \
+        ctype \
+        bcmath \
+        intl \
+        opcache \
+        gd \
+        zip
+
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
