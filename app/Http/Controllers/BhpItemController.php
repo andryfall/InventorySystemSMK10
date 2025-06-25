@@ -52,6 +52,72 @@ public function index()
     return response()->json($items);
 }
 
+    public function indexFiltered(Request $request)
+{
+    $request->validate([
+        'month' => 'required|integer|min:1|max:12',
+        'year' => 'required|integer|min:1900',
+    ]);
+
+    $month = $request->input('month');
+    $year = $request->input('year');
+
+    $startOfMonth = now()->setDate($year, $month, 1)->startOfMonth();
+    $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+    $items = BhpItem::with('kodeRekening')->get()->sortBy(function ($item) {
+        return array_map('intval', explode('.', $item->kodeRekening->kode ?? ''));
+    })->values();
+
+    $data = [];
+    $counter = 1;
+
+    foreach ($items as $item) {
+        $stockAwal = $item->mutasi()
+            ->where('created_at', '<', $startOfMonth)
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+            ->value('total') ?? 0;
+
+        $stockAkhirDelta = $item->mutasi()
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->selectRaw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) AS total")
+            ->value('total') ?? 0;
+
+        $penambahan = $item->mutasi()
+            ->where('created_at', '<', $endOfMonth)
+            ->where('type', 'add')
+            ->sum('quantity');
+
+        $pengurangan = $item->mutasi()
+            ->where('created_at', '<', $endOfMonth)
+            ->where('type', 'remove')
+            ->sum('quantity');
+
+        $stockAkhir = $stockAwal + $stockAkhirDelta;
+
+        $data[] = [
+            'no'              => $counter++,
+            'nama_barang'     => $item->nama_barang,
+            'kode_rekening'   => $item->kodeRekening->kode ?? '',
+            'merk'            => $item->merk,
+            'stock_awal'      => $stockAwal,
+            'satuan'          => $item->satuan,
+            'harga_satuan'    => $item->harga,
+            'jumlah_awal'     => $stockAwal * $item->harga,
+            'penambahan'      => $penambahan,
+            'pengurangan'     => $pengurangan,
+            'stock_akhir'     => $stockAkhir,
+            'jumlah_akhir'    => $stockAkhir * $item->harga,
+        ];
+    }
+
+    return response()->json([
+        'month' => $month,
+        'year'  => $year,
+        'data'  => $data,
+    ]);
+}
+
 
     public function store(Request $request)
     {

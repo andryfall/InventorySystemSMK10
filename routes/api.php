@@ -89,6 +89,7 @@ Route::middleware('auth:sanctum')->group(callback: function () {
     Route::delete('/bhp/{id}', action: [BhpItemController::class, 'destroy']);
     
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
+    Route::get('/bhp/filter', [BhpItemController::class, 'indexFiltered']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     
     Route::get('/bhp/indexsummary', [BhpItemController::class, 'getAllMonthlyStocks']);
