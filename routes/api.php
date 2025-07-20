@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(callback: function () {
     Route::get('/bhp/index', [BhpItemController::class, 'index']);
     Route::post('/bhp/remove/{id}', [BhpItemController::class, 'remove']);
     
+    Route::get('/bhp/indexsummary', [BhpItemController::class, 'getAllMonthlyStocks']);
     Route::post('/bhp/undo-remove/{id}', [BhpItemController::class, 'undoRemoval']);
     Route::get('/bhp/riwayat', [BhpItemController::class, 'getRemovalLogs']);
     Route::get('/bhp/total-harga/{year}', [BhpItemController::class, 'totalJumlahAkhirByYear']);

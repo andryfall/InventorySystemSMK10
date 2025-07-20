@@ -28,4 +28,5 @@ class BhpItem extends Model
     {
         return $this->hasMany(Mutasi::class);
     }
+
 }

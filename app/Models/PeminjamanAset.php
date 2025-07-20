@@ -28,6 +28,7 @@ class PeminjamanAset extends Model
 
     public function assetItem()
     {
-        return $this->belongsTo(AssetItem::class);
+        return $this->belongsTo(AssetItem::class, 'asset_item_id', 'aset');
     }
+
 }

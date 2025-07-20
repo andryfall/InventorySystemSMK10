@@ -11,13 +11,27 @@ class PeminjamanAsetController extends Controller
 {
     public function index()
     {
-        $peminjamans = PeminjamanAset::with('assetItem')
+        $peminjamans = PeminjamanAset::with('assetItem.kodeBarang')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($peminjaman) {
+                return [
+                    'id' => $peminjaman->id,
+                    'asset_item_id' => $peminjaman->asset_item_id,
+                    'nama_peminjam' => $peminjaman->nama_peminjam,
+                    'volume' => $peminjaman->volume,
+                    'keperluan' => $peminjaman->keperluan,
+                    'status' => $peminjaman->status,
+                    'tanggal_pinjam' => $peminjaman->tanggal_pinjam,
+                    'tanggal_kembali' => $peminjaman->tanggal_kembali,
+                    'created_at' => $peminjaman->created_at,
+                    'updated_at' => $peminjaman->updated_at,
+                    'nama_barang' => $peminjaman->assetItem->kodeBarang->uraian ?? null,
+                ];
+            });
 
         return response()->json($peminjamans);
     }
-
 
     public function store(Request $request, $id)
     {

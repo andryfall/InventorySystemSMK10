@@ -30,10 +30,6 @@ class BhpItemController extends Controller
                     ->select(DB::raw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) as total"))
                     ->value('total');
     
-                $stockAkhir = $item->mutasi()
-                    ->select(DB::raw("COALESCE(SUM(CASE WHEN type = 'add' THEN quantity ELSE -quantity END), 0) as total"))
-                    ->value('total');
-    
                 return [
                     'id'            => $item->id,
                     'Nama Barang'   => $item->nama_barang,
@@ -41,10 +37,10 @@ class BhpItemController extends Controller
                     'Merk'          => $item->merk,
                     'Tanggal'       => $item->updated_at->toDateString(),
                     'Stock Awal'    => $stockAwal,
-                    'Stock Akhir'   => $stockAkhir,
+                    'Stock Akhir'   => $item->total_volume,
                     'Harga Satuan'  => $item->harga,
                     'Jumlah Awal'   => $stockAwal * $item->harga,
-                    'Jumlah Akhir'  => $stockAkhir * $item->harga,
+                    'Jumlah Akhir'  => $item->total_volume * $item->harga,
                 ];
             })
             ->sortBy('id')
